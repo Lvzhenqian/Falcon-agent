@@ -9,11 +9,14 @@
 hook-ctypes.macholib.py 是作用于导入apscheduler模块。
 
 编译命令：
-pyinstaller --onefile \
-            --name agent --paths .\api;.\AutoUpdate;.\Client;.\Metric;.\PluginManage;.\util  \
-            --workpath D:\work\build --distpath D:\ --specpath D:\work --upx-dir D:\upx394w \
+pyinstaller --name agent \
+            --onefile  --paths ./;./api;./AutoUpdate;./Client;./Metric;./PluginManage;./util \
+            --workpath D:/work/build \
+            --distpath D:/ \
+            --specpath D:/work \
+            --upx-dir D:/upx394w \
             --hidden-import greenlet \
-            --additional-hooks-dir .\ AppMain.py
+            --additional-hooks-dir=. AppMain.py
 
 
 出现greenlet模块错误：
