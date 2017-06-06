@@ -3,8 +3,8 @@ import logging
 import os
 import sys
 
-SCRIPTPATH = r'D:\FalconAgent'
-# SCRIPTPATH = os.path.dirname(os.path.realpath(sys.executable))
+# SCRIPTPATH = r'D:\FalconAgent'
+SCRIPTPATH = os.path.dirname(os.path.realpath(sys.executable))
 cfg_file = os.path.join(SCRIPTPATH, 'cfg.json')
 logging.debug(cfg_file)
 config = None
