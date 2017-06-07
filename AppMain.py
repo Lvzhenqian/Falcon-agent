@@ -15,10 +15,8 @@ def service():
     main_log.debug('开启API服务!')
     thread.APIthread()
     main_log.debug('开始作业：{}'.format(thread.Jobs.get_jobs()))
-    thread.Jobs.start()
     try:
-        while True:
-            pass
+        thread.Jobs.start()
     except (KeyboardInterrupt, SystemExit):
         thread.Jobs.shutdown()
         main_log.debug('主进程退出！')
