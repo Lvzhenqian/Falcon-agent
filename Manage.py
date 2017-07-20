@@ -2,7 +2,7 @@
 import os
 import logging
 from config import log_File, leve
-from TransClient import UpdateMetric
+from JsonClient import UpdateMetric
 import crond
 
 manage_log = logging.getLogger('root.Mange')

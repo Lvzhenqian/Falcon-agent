@@ -4,7 +4,7 @@ import psutil
 import time
 import logging
 
-from TransClient import UpdateMetric
+from JsonClient import UpdateMetric
 from config import HOSTNAME, log_File, VERSION, COLLECTOR, IGNORE, leve
 
 base_log = logging.getLogger('root.BaseMetric')

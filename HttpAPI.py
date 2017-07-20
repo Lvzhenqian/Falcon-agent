@@ -1,7 +1,7 @@
 # coding=utf-8
 import logging
 from flask import Flask, request, jsonify
-import TransClient
+from JsonClient import UpdateMetric
 from config import log_File, leve
 
 app = Flask(__name__)
@@ -29,10 +29,10 @@ def Push_Metric_By_Youreself():
         api_log.debug(data)
         if isinstance(data, dict):
             update.append(data)
-            rep = TransClient.UpdateMetric(update)
+            rep = UpdateMetric(update)
         elif isinstance(data, list):
             update.extend(data)
-            rep = TransClient.UpdateMetric(update)
+            rep = UpdateMetric(update)
         else:
             return jsonify('fail %s' % data)
     except Exception as err:
