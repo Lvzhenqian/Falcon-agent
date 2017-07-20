@@ -7,6 +7,7 @@
 `pyinstaller --name agent --onefile --workpath D:/work/build --distpath D:/ --specpath D:/work --upx-dir D:/upx394w --hidden-import greenlet --additional-hooks-dir=. AppMain.py`
 
 ### 源码文件说明：
+```
 AppMain.py                  主程序入口，一般编译时指向的就是这个文件。
 AutoInstall.py              自动下载更新，安装插件，主要作用是对比MD5.txt文件并下载安装客户端
 BaseMetric                  自动获取系统基础数据，拼凑好后提交
@@ -17,6 +18,6 @@ HttpAPI.py                  一个使用Flask 框架来提供API接口
 Manage.py                   扩展程序管理模块，用来读取plugin目录里的 .py 文件，执行并获取其metric
 Repo.py                     HBS 固定数据上传使用。
 JsonClient.py               提供用于传送数据的JSON客户端。
-
+```
 
 
