@@ -30,7 +30,7 @@ def diskIO():
     pythoncom.CoInitialize()
     time_now = int(time.time())
     payload = []
-    disk_io_stat.debug(u"创建WMI对象前！")
+    # disk_io_stat.debug(u"创建WMI对象前！")
     WmiObject = GetObject('winmgmts:/root/cimv2')
     try:
         base_sql = """SELECT 
@@ -40,7 +40,7 @@ def diskIO():
                         DiskReadsPerSec,
                         DiskWriteBytesPerSec,
                         DiskWritesPerSec FROM Win32_PerfRawData_PerfDisk_PhysicalDisk WHERE name='_Total' """
-        disk_io_stat.debug(u"执行base_sql前！")
+        # disk_io_stat.debug(u"执行base_sql前！")
         base_stat = WmiObject.ExecQuery(base_sql)
         # read.count
         data = {"endpoint": HOSTNAME, "metric": "disk.io.msec_read", "timestamp": time_now, "step": 60,
@@ -70,7 +70,7 @@ def diskIO():
         disk_io_stat.error(u"基础磁盘IO获取失败！错误代码：%s", e)
     # util
     try:
-        disk_io_stat.debug(u"执行util_sql前！")
+        # disk_io_stat.debug(u"执行util_sql前！")
         util_sql = """SELECT PercentIdleTime FROM Win32_PerfFormattedData_PerfDisk_PhysicalDisk WHERE name='_Total'"""
         util_stat = WmiObject.ExecQuery(util_sql)
         data = {"endpoint": HOSTNAME, "metric": "disk.io.util", "timestamp": time_now, "step": 60,

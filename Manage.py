@@ -50,7 +50,7 @@ class JobsManage:
         parms = []
         try:
             data, plugin_err = self.executive(py)
-            manage_log.debug(u"%s文件数值： %s" % (py, data))
+            # manage_log.debug(u"%s文件数值： %s" % (py, data))
         except AttributeError:
             data = False
             plugin_err = True
@@ -64,7 +64,7 @@ class JobsManage:
             manage_log.error(u"错误！无法读取[%s] 这个插件." % (os.path.basename(py)))
             manage_log.error(u"%s 插件错误信息：%s" % (os.path.basename(py), plugin_err))
         #准备开始上传插件
-        manage_log.debug(u"%s 插件将要上传的数值：%s" % (os.path.basename(py),parms))
+        # manage_log.debug(u"%s 插件将要上传的数值：%s" % (os.path.basename(py),parms))
         rep = UpdateMetric(parms)
         if rep:
             manage_log.info(u"上传 %s 成功！状态：%s" % (os.path.basename(py), rep))

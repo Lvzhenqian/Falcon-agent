@@ -82,18 +82,23 @@ network interface:
     time_now = int(time.time())
     payload = []
     # agent alive
+    base_log.debug(u"开始导入agent.alive值到列表中！")
     data = {"endpoint": HOSTNAME, "metric": "agent.alive", "timestamp": time_now, "step": 60, "value": 1,
             "counterType": "GAUGE", "tags": ""}
     payload.append(copy.copy(data))
+    base_log.debug(u"导入agent.alive值成功！")
 
     # version
+    base_log.debug(u"开始导入agent.version值到列表中！")
     data["metric"] = "agent.version"
     data["value"] = VERSION
     data["counterType"] = "GAUGE"
     payload.append(copy.copy(data))
+    base_log.debug(u"导入agent.version值到成功！")
 
     # cpu
     try:
+        base_log.debug(u"开始导入CPU监控值到列表中！")
         cpu_status = psutil.cpu_times_percent()
         # cpu.user
         data["metric"] = "cpu.user"
@@ -112,11 +117,13 @@ network interface:
         data["metric"] = "cpu.busy"
         data["value"] = round(100 - cpu_status.idle, 2)
         payload.append(copy.copy(data))
+        base_log.debug(u"导入CPU监控值成功！")
     except Exception, e:
         base_log.error(u"获取CPU数据失败！错误信息：%s", e)
 
     # memory and swap
     try:
+        base_log.debug(u"开始导入memory以及swap监控值到列表中！")
         swap_status = psutil.swap_memory()
         mem_status = psutil.virtual_memory()
         #########memory########
@@ -161,11 +168,13 @@ network interface:
         data["metric"] = "mem.swapfree.percent"
         data["value"] = round(100 - swap_status.percent, 2)
         payload.append(copy.copy(data))
+        base_log.debug(u"导入memory以及swap监控值成功！")
     except Exception, e:
         base_log.error(u"获取内存或者虚拟内存信息失败！错误信息：%s", e)
 
     # disk_partitions
     try:
+        base_log.debug(u"开始导入磁盘分区信息监控值到列表中！")
         disk_status = psutil.disk_partitions()
         for disk in disk_status:
             if 'cdrom' in disk.opts or disk.fstype == '':
@@ -192,23 +201,23 @@ network interface:
             data["metric"] = "df.bytes.free.percent"
             data["value"] = round(100 - disk_info.percent, 2)
             payload.append(copy.copy(data))
+        base_log.debug(u"导入磁盘分区信息监控值成功！")
     except Exception, e:
         base_log.error(u"获取磁盘分区信息失败！错误信息：%s", e)
 
     # disk_io_status
     try:
-        base_log.debug(u"执行diskIO函数前！")
+        base_log.debug(u"开始执行diskIO函数！并导入磁盘IO信息")
         get_disk_io = diskIO()
-        base_log.debug(get_disk_io)
+        # base_log.debug(get_disk_io)
         if get_disk_io:
             payload.extend(get_disk_io)
+            base_log.debug(u"导入磁盘IO信息成功！")
     except Exception, e:
-        print e
-        if isinstance(e, tuple):
-            base_log.error(e[1].encode('raw_unicode_escape'))
         base_log.error(u"获取磁盘信息错误！错误信息：%s", e)
     # network interface
     try:
+        base_log.debug(u"开始导入网卡监控值！")
         net_io_status = psutil.net_io_counters(pernic=True)
         for key in net_io_status:
             if is_interface_ignore(key):
@@ -262,6 +271,7 @@ network interface:
             data["metric"] = "net.if.total.dropped"
             data["value"] = (net_io_status[key].dropin + net_io_status[key].dropout)
             payload.append(copy.copy(data))
+        base_log.debug(u"导入网卡监控值成功！")
     except Exception, e:
         base_log.error(u"获取网络接口信息失败！错误信息：%s", e)
 
@@ -272,8 +282,6 @@ network interface:
         result = UpdateMetric(data)
         if result:
             base_log.info(u"上传基础数据成功！")
-        base_log.debug(result)
-    except Exception as err:
-        base_log.error(err)
-    else:
-        base_log.error(result)
+        base_log.debug(u"上传数据后返回值：%s", result)
+    except Exception, err:
+        base_log.error(u"上传基础数据出错！报错信息:%s", err)
