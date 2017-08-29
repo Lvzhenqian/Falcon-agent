@@ -15,6 +15,9 @@ manage_log.addHandler(log_File)
 
 
 class JobsManage:
+    '''
+    插件管理类，用于读取并执行plugin里的.py文件。并把获取到的值加入metric列表
+    '''
     def __init__(self, plugin):
         self.PluginPath = plugin
 
@@ -77,6 +80,7 @@ class JobsManage:
                 except ValueError:
                     manage_log.error(u'''无法导入 %s 此文件，格式说明：300_ping.py''' % f_name)
                     continue
+                # 加入计划任务列表，在每次客户端启动时。ps:所有的plugin在新增时要重启客户端，才会生效。原因如下：
                 crond.Jobs.add_job(func=self.push, args=(os.path.join(self.PluginPath, f_name),), trigger='interval',
                                    seconds=int(timer), id=name[:-3])
             else:

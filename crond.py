@@ -23,6 +23,10 @@ Plugins.make_jobs()
 
 @Jobs.scheduled_job(trigger='interval', id='UpdataThread', minutes=5)
 def UpdataThread():
+    '''
+    更新线程，每5分钟执行一次，会对比md5.txt是否与服务器上的md5.txt里一致。
+    :return:
+    '''
     server_md5 = None
     ins = Upgrade()
     try:
@@ -39,6 +43,10 @@ def UpdataThread():
 
 
 def APIthread():
+    '''
+    API接口线程，方便用户自己通过调用接口来提交数据。
+    :return:
+    '''
     ports = HTTP.get('listen')
     if ports:
         t = Thread(target=HttpAPI.app.run, kwargs=dict(port=ports), name=u'API接口线程')
@@ -51,6 +59,10 @@ def APIthread():
 
 @Jobs.scheduled_job(trigger='interval', id='BaseMetric', minutes=1)
 def BasePush():
+    '''
+    基础数据提交线程，每一分钟自动执行collect()函数来获取metric,并提交到服务器
+    :return:
+    '''
     try:
         collect()
     except Exception as err:
@@ -60,5 +72,9 @@ def BasePush():
 
 @Jobs.scheduled_job(trigger='interval', id='HbsRepo', minutes=1)
 def RepoPush():
+    '''
+    HBS提交线程
+    :return:
+    '''
     return report()
 

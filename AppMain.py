@@ -16,6 +16,10 @@ coding()
 
 
 def service():
+    '''
+    服务进程！开启前台服务作业！
+    :return:
+    '''
     if HTTP.get('enabled'):
         main_log.debug(u'开启API服务!')
         crond.APIthread()
@@ -28,6 +32,10 @@ def service():
 
 
 def main():
+    '''
+    主进程，判断是否需要安装或者直接启动前台服务作业。
+    :return:
+    '''
     m = AutoInstall.Upgrade()
     if not os.path.exists(m.Install_Path) or os.path.exists(m.AgentMd5):
         main_log.debug(u"检查到目录或者MD5文件不存在，开始安装程序！")

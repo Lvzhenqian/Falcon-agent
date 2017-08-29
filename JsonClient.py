@@ -13,6 +13,9 @@ jclient.addHandler(log_File)
 
 
 class client(object):
+    '''
+    json通信客户端，初始化连接并发送数据。
+    '''
     def __init__(self, ip, port):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.ip = ip
@@ -36,6 +39,12 @@ class client(object):
             n += 1
 
     def SendMetric(self, name, data):
+        '''
+        发送数据并接收返回的状态
+        :param name: 传送数据的类型
+        :param data: 数据
+        :return: 接收结果
+        '''
         count = client.count()
         sender = dict(id=next(count), method=name, params=[data])
         s_id = sender.get('id')
@@ -53,6 +62,11 @@ class client(object):
 
 
 def UpdateMetric(metrics):
+    '''
+    所有metric的传送函数，使用client的实例
+    :param metrics: 要发送的数据
+    :return: 返回结果
+    '''
     if isinstance(ADDRS, list):
         for add in ADDRS:
             ip, port = add.split(':')
@@ -67,6 +81,11 @@ def UpdateMetric(metrics):
 
 
 def UpdateReport(metrics):
+    '''
+    只用于Report的传送函数，client实例
+    :param metrics: 数据
+    :return: 返回的结果
+    '''
     ip, port = HBS.split(':')
     with client(ip, int(port)) as hbs:
         for _ in range(5):

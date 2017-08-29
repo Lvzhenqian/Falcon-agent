@@ -18,12 +18,66 @@ base_log.addHandler(log_File)
 
 
 def is_interface_ignore(key):
+    '''
+    是否忽略某些接口的值
+    :param key: 传入接口名称
+    :return: 返回true
+    '''
     for ignore_key in COLLECTOR['ifacePrefixIgnore']:
         if ignore_key in key.decode('gbk'):
             return True
 
 
 def collect():
+    '''
+    基础 数据获取、上传函数。函数获取监控指标列表：
+agent alive
+version
+cpu:
+    cpu.user
+    cpu.idle
+    cpu.busy
+    cpu.system
+memory and swap:
+    mem.memtotal
+    mem.memused
+    mem.memfree.percent
+    mem.memfree
+    mem.memused.percent
+    mem.swapused.percent
+    mem.swaptotal
+    mem.swapused
+    mem.swapfree
+    mem.swapfree.percent
+disk_partitions:
+    df.bytes.used.percent
+    df.bytes.total
+    df.bytes.used
+    df.bytes.free
+    df.bytes.free.percent
+disk io_status:
+    disk.io.msec_read
+    disk.io.msec_write
+    disk.io.read_bytes
+    disk.io.read_requests
+    disk.io.write_bytes
+    disk.io.write_requests
+    disk.io.util
+network interface:
+    net.if.in.bytes
+    net.if.out.bytes
+    net.if.in.packets
+    net.if.out.packets
+    net.if.in.errors
+    net.if.out.errors
+    net.if.in.dropped
+    net.if.out.dropped
+    net.if.total.bytes
+    net.if.total.packets
+    net.if.total.errors
+    net.if.total.dropped
+    :return:
+    '''
     base_log.debug(u'基础数据提交')
     time_now = int(time.time())
     payload = []
@@ -41,7 +95,6 @@ def collect():
     # cpu
     try:
         cpu_status = psutil.cpu_times_percent()
-        base_log.debug(cpu_status)
         # cpu.user
         data["metric"] = "cpu.user"
         data["value"] = cpu_status.user
@@ -60,7 +113,7 @@ def collect():
         data["value"] = round(100 - cpu_status.idle, 2)
         payload.append(copy.copy(data))
     except Exception, e:
-        base_log.error(e)
+        base_log.error(u"获取CPU数据失败！错误信息：%s", e)
 
     # memory and swap
     try:
@@ -109,7 +162,7 @@ def collect():
         data["value"] = round(100 - swap_status.percent, 2)
         payload.append(copy.copy(data))
     except Exception, e:
-        base_log.error(e)
+        base_log.error(u"获取内存或者虚拟内存信息失败！错误信息：%s", e)
 
     # disk_partitions
     try:
@@ -140,12 +193,20 @@ def collect():
             data["value"] = round(100 - disk_info.percent, 2)
             payload.append(copy.copy(data))
     except Exception, e:
-        base_log.error(e)
+        base_log.error(u"获取磁盘分区信息失败！错误信息：%s", e)
 
     # disk_io_status
-    get_disk_io = diskIO()
-    if get_disk_io:
-        payload.extend(get_disk_io)
+    try:
+        base_log.debug(u"执行diskIO函数前！")
+        get_disk_io = diskIO()
+        base_log.debug(get_disk_io)
+        if get_disk_io:
+            payload.extend(get_disk_io)
+    except Exception, e:
+        print e
+        if isinstance(e, tuple):
+            base_log.error(e[1].encode('raw_unicode_escape'))
+        base_log.error(u"获取磁盘信息错误！错误信息：%s", e)
     # network interface
     try:
         net_io_status = psutil.net_io_counters(pernic=True)
@@ -202,7 +263,7 @@ def collect():
             data["value"] = (net_io_status[key].dropin + net_io_status[key].dropout)
             payload.append(copy.copy(data))
     except Exception, e:
-        base_log.error(e)
+        base_log.error(u"获取网络接口信息失败！错误信息：%s", e)
 
     data = [x for x in payload if x.get('metric') not in IGNORE]
     base_log.debug(data)

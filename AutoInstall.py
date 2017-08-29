@@ -25,10 +25,12 @@ install_log.addHandler(log_File)
 
 
 class Upgrade(object):
+    '''
+    安装升级类，用于自动更新或者第一次安装。
+    '''
     Install_Path = cfg.get('INSTALLPATH')
 
     def __init__(self):
-
         self.__ip = cfg.get('GETIP')
         self.__zk_ip = cfg.get('ZKAPI')
         self.__Agent = cfg.get('PACKAGE')
@@ -39,6 +41,12 @@ class Upgrade(object):
         self.__Backup_Path = self.Install_Path + '_%s' % time.strftime('%Y-%m-%d')
 
     def __ChangeFile(self, ip, x):
+        '''
+        读取配置文件并修改hostname
+        :param ip: 要修改的hostname
+        :param x: 要修改的配置文件路径
+        :return: 修改成功，Tr
+        '''
         try:
             with open(x, mode='rt') as r:
                 dit = r.read()
@@ -57,6 +65,10 @@ class Upgrade(object):
             return False
 
     def __SelectIp(self):
+        '''
+        对比中控，ip.7road.net选择出正确的IP地址，以及要修改的json文件
+        :return: 返回(ip,json文件路径)元组
+        '''
         install_log.debug(u'选择IP 与 cfg.json文件')
         try:
             with urlopener(self.__ip) as op:
@@ -83,6 +95,7 @@ class Upgrade(object):
             return socket.gethostbyname(hsn), os.path.join(self.Download_Path, 'agent\cfg.json')
 
     def Download_And_Install(self, s_md5):
+        '''主进程。下载安装包，并安装。'''
         try:
             if not os.path.isdir(self.Download_Path):
                 os.mkdir(self.Download_Path)
@@ -109,6 +122,10 @@ class Upgrade(object):
             return install_log.error(u"无法下载，请检查网络！地址：%s" % self.__Agent)
 
     def __AddService(self):
+        '''
+        添加程序进系统服务，调用nssm.exe程序
+        :return:返回True
+        '''
         install_log.debug(u'加入系统服务.')
         os.system(r'%s install FalconAgent %s' % (os.path.join(
             self.Install_Path, 'nssm64.exe') if machine() == 'AMD64' else os.path.join(
@@ -123,6 +140,12 @@ class Upgrade(object):
         return True
 
     def __services_manage(self, action, service='falconagent'):
+        '''
+        服务管理，用于更新时的检查，重启服务
+        :param action: 服务的动作（传入字符串start|stop|restart）
+        :param service: 服务的名称，默认为falconagent
+        :return: 返回服务的状态。
+        '''
         rule = {'stop': win32serviceutil.StopService, 'start': win32serviceutil.StartService,
                 'restart': win32serviceutil.RestartService}
         if action == 'status':
@@ -135,6 +158,12 @@ class Upgrade(object):
             return rule.get(action, 'restart')(service)
 
     def __Install(self, x, ds):
+        '''
+        安装主步骤，先解压，修改json文件，移动目录，添加windows服务再启动服务。
+        :param x: 下载文件的路径。
+        :param ds: 安装到的目标目录。
+        :return: 返回状态。
+        '''
         install_log.debug(u'解压，请等待！')
         f = ZipFile(x, mode='r')
         f.extractall(ds)
@@ -186,6 +215,10 @@ class Upgrade(object):
                 install_log.error(err)
 
     def Remote_Md5(self):
+        '''
+        对比远程Md5.txt文件
+        :return: 返回md5码
+        '''
         with urlopener(self.AgentMd5) as f:
             for i in f:
                 _md5, pkname = i.split()
@@ -195,6 +228,10 @@ class Upgrade(object):
                 return install_log.error(u'在md5.txt里找不到对应安装包的MD5码，请确认！')
 
     def File_Md5(self):
+        '''
+        读取本地md5.txt文件，来验证是否需要更新
+        :return: 返回本地md5.txt里面的md5码。
+        '''
         fe = os.path.join(self.Install_Path, 'md5.txt')
         install_log.debug(u"本地MD5%s文件"%fe)
         if os.path.exists(fe):

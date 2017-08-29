@@ -16,11 +16,19 @@ api_log.addHandler(log_File)
 
 @app.route('/health', methods=['GET'])
 def health():
+    '''
+    GET 接口。用于测试接口是否正常
+    :return: 返回字符串
+    '''
     return jsonify('ok')
 
 
 @app.route('/v1/push', methods=['POST'])
 def Push_Metric_By_Youreself():
+    '''
+    自定义数据提交接口
+    :return: 返回接口提交的状态
+    '''
     rep = False
     update = []
     api_log.info(u'自定义数据上传接口')

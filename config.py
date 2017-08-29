@@ -36,6 +36,10 @@ except Exception as e:
 
 
 def loadINSTALL():
+    '''
+    加载 install.json文件，方便后期修改下载更新地址。
+    :return:
+    '''
     # install.json加载
     try:
         logging.debug(u"开始加载%s配置文件！" % install_file)
@@ -67,6 +71,9 @@ log_File.setFormatter(log_fmt)
 
 
 class urlopener(object):
+    '''
+    统一url的访问以及关闭。
+    '''
     def __init__(self, url):
         self.url = url
 
@@ -79,6 +86,10 @@ class urlopener(object):
 
 
 def coding():
+    '''
+    终端字符乱码问题解决函数
+    :return:
+    '''
     if sys.getdefaultencoding() == 'ascii':
         reload(sys)
         sys.setdefaultencoding('utf8')
