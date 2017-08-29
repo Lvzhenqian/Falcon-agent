@@ -266,7 +266,7 @@ network interface:
         base_log.error(u"获取网络接口信息失败！错误信息：%s", e)
 
     data = [x for x in payload if x.get('metric') not in IGNORE]
-    base_log.debug(data)
+    # base_log.debug(data)
 
     try:
         result = UpdateMetric(data)
