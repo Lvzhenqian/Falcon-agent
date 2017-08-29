@@ -18,6 +18,7 @@ HttpAPI.py                  一个使用Flask 框架来提供API接口
 Manage.py                   扩展程序管理模块，用来读取plugin目录里的 .py 文件，执行并获取其metric
 Repo.py                     HBS 固定数据上传使用。
 JsonClient.py               提供用于传送数据的JSON客户端。
+diskIOmertic.py             调用WMI客户端来获取磁盘IO信息，并加入到BaseMetric里提交。
 ```
 
 
