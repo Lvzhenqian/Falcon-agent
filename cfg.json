@@ -1,0 +1,29 @@
+{
+  "http": {
+    "enabled": true,
+    "listen": 1988
+  },
+  "ip": "",
+  "hostname": "windows-test2",
+  "ignore": ["cpu.busy"],
+  "version": 1,
+  "transfer": {
+    "interval": 60,
+    "enabled": true,
+    "addrs": [
+      "127.0.0.1:8433",
+      "127.0.0.1:8433"
+    ],
+    "timeout": 1000
+  },
+  "debug": true,
+  "metric_log":false,
+  "heartbeat": {
+    "interval": 60,
+    "enabled": true,
+    "addr": "127.0.0.1:6030",
+    "timeout": 1000
+  },
+  "collector": {
+    "ifacePrefixIgnore": ["Loopback", "Teredo Tunneling", "isatap", "6TO4 Adapter"]}
+}

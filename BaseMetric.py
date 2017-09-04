@@ -5,11 +5,11 @@ import time
 import logging
 
 from JsonClient import UpdateMetric
-from config import HOSTNAME, log_File, VERSION, COLLECTOR, IGNORE, leve
+from config import HOSTNAME, log_File, VERSION, COLLECTOR, IGNORE, base_leve, MLOG
 from diskIOmertic import diskIO
 
-base_log = logging.getLogger('root.BaseMetric')
-base_log.setLevel(leve)
+base_log = logging.getLogger(u'基础监控')
+base_log.setLevel(base_leve)
 base_log.propagate = False
 base_log.addHandler(log_File)
 
@@ -18,18 +18,18 @@ base_log.addHandler(log_File)
 
 
 def is_interface_ignore(key):
-    '''
+    """
     是否忽略某些接口的值
     :param key: 传入接口名称
     :return: 返回true
-    '''
+    """
     for ignore_key in COLLECTOR['ifacePrefixIgnore']:
         if ignore_key in key.decode('gbk'):
             return True
 
 
 def collect():
-    '''
+    """
     基础 数据获取、上传函数。函数获取监控指标列表：
 agent alive
 version
@@ -77,16 +77,19 @@ network interface:
     net.if.total.errors
     net.if.total.dropped
     :return:
-    '''
+    """
     base_log.debug(u'基础数据提交')
     time_now = int(time.time())
     payload = []
+    start = payload.__len__()
     # agent alive
     base_log.debug(u"开始导入agent.alive值到列表中！")
     data = {"endpoint": HOSTNAME, "metric": "agent.alive", "timestamp": time_now, "step": 60, "value": 1,
             "counterType": "GAUGE", "tags": ""}
     payload.append(copy.copy(data))
-    base_log.debug(u"导入agent.alive值成功！")
+    _next = payload.__len__() - start
+    start = payload.__len__()
+    base_log.debug(u"导入agent.alive值成功！导入数量：%s" % _next)
 
     # version
     base_log.debug(u"开始导入agent.version值到列表中！")
@@ -94,7 +97,9 @@ network interface:
     data["value"] = VERSION
     data["counterType"] = "GAUGE"
     payload.append(copy.copy(data))
-    base_log.debug(u"导入agent.version值到成功！")
+    _next = payload.__len__() - start
+    start = payload.__len__()
+    base_log.debug(u"导入agent.version值到成功！导入数量：%s" % _next)
 
     # cpu
     try:
@@ -117,9 +122,11 @@ network interface:
         data["metric"] = "cpu.busy"
         data["value"] = round(100 - cpu_status.idle, 2)
         payload.append(copy.copy(data))
-        base_log.debug(u"导入CPU监控值成功！")
+        _next = payload.__len__() - start
+        start = payload.__len__()
+        base_log.debug(u"导入CPU监控值成功！导入量：%s" % _next)
     except Exception, e:
-        base_log.error(u"获取CPU数据失败！错误信息：%s", e)
+        base_log.error(u"获取CPU数据失败！错误信息：%s" % e)
 
     # memory and swap
     try:
@@ -168,9 +175,11 @@ network interface:
         data["metric"] = "mem.swapfree.percent"
         data["value"] = round(100 - swap_status.percent, 2)
         payload.append(copy.copy(data))
-        base_log.debug(u"导入memory以及swap监控值成功！")
+        _next = payload.__len__() - start
+        start = payload.__len__()
+        base_log.debug(u"导入memory以及swap监控值成功！导入量:%s" % _next)
     except Exception, e:
-        base_log.error(u"获取内存或者虚拟内存信息失败！错误信息：%s", e)
+        base_log.error(u"获取内存或者虚拟内存信息失败！错误信息：%s" % e)
 
     # disk_partitions
     try:
@@ -201,9 +210,11 @@ network interface:
             data["metric"] = "df.bytes.free.percent"
             data["value"] = round(100 - disk_info.percent, 2)
             payload.append(copy.copy(data))
-        base_log.debug(u"导入磁盘分区信息监控值成功！")
+        _next = payload.__len__() - start
+        start = payload.__len__()
+        base_log.debug(u"导入磁盘分区信息监控值成功！导入量：%s" % _next)
     except Exception, e:
-        base_log.error(u"获取磁盘分区信息失败！错误信息：%s", e)
+        base_log.error(u"获取磁盘分区信息失败！错误信息：%s" % e)
 
     # disk_io_status
     try:
@@ -212,9 +223,11 @@ network interface:
         # base_log.debug(get_disk_io)
         if get_disk_io:
             payload.extend(get_disk_io)
-            base_log.debug(u"导入磁盘IO信息成功！")
+            _next = payload.__len__() - start
+            start = payload.__len__()
+            base_log.debug(u"导入磁盘IO信息成功！导入量：%s" % _next)
     except Exception, e:
-        base_log.error(u"获取磁盘信息错误！错误信息：%s", e)
+        base_log.error(u"获取磁盘信息错误！错误信息：%s" % e)
     # network interface
     try:
         base_log.debug(u"开始导入网卡监控值！")
@@ -226,6 +239,7 @@ network interface:
             data["metric"] = "net.if.in.bytes"
             data["value"] = net_io_status[key].bytes_recv
             data["tags"] = "iface=" + key.decode("gbk")
+            data["counterType"] = "COUNTER"
             payload.append(copy.copy(data))
             # out.bytes
             data["metric"] = "net.if.out.bytes"
@@ -271,17 +285,26 @@ network interface:
             data["metric"] = "net.if.total.dropped"
             data["value"] = (net_io_status[key].dropin + net_io_status[key].dropout)
             payload.append(copy.copy(data))
-        base_log.debug(u"导入网卡监控值成功！")
+        _next = payload.__len__() - start
+        base_log.debug(u"导入网卡监控值成功！导入量：%s" % _next)
     except Exception, e:
         base_log.error(u"获取网络接口信息失败！错误信息：%s", e)
 
     data = [x for x in payload if x.get('metric') not in IGNORE]
-    # base_log.debug(data)
+    # metric log
+    if MLOG:
+        from config import metric_file, metric_leve
+        metriclog = logging.getLogger(u'基础监控日志')
+        metriclog.setLevel(metric_leve)
+        metriclog.propagate = False
+        metriclog.addHandler(metric_file)
+        metriclog.debug(data)
 
     try:
+        base_log.debug(u"即将上传的数据总数：%s", len(data))
         result = UpdateMetric(data)
         if result:
             base_log.info(u"上传基础数据成功！")
-        base_log.debug(u"上传数据后返回值：%s", result)
+
     except Exception, err:
         base_log.error(u"上传基础数据出错！报错信息:%s", err)

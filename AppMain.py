@@ -5,10 +5,10 @@ import sys
 
 import AutoInstall
 import crond
-from config import log_File, leve, coding, HTTP
+from config import log_File, base_leve, coding, HTTP
 
-main_log = logging.getLogger('root')
-main_log.setLevel(leve)
+main_log = logging.getLogger(u'主进程')
+main_log.setLevel(base_leve)
 main_log.addHandler(log_File)
 # main_log.addHandler(console)
 main_log.debug('console coding is: %s' % sys.getdefaultencoding())

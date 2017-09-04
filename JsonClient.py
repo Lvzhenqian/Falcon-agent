@@ -2,12 +2,12 @@
 import json
 import socket
 import logging
-from config import TRANSFER, HEARTBEAT, leve, log_File
+from config import TRANSFER, HEARTBEAT, base_leve, log_File
 
 ADDRS = TRANSFER['addrs']
 HBS = HEARTBEAT.get('addr')
-jclient = logging.getLogger('root.JsonClient')
-jclient.setLevel(leve)
+jclient = logging.getLogger(u'Json客户端')
+jclient.setLevel(base_leve)
 jclient.propagate = False
 jclient.addHandler(log_File)
 

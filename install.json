@@ -1,0 +1,8 @@
+{
+  "GetIP":"http://127.0.0.1",
+  "ZkAPI":"http://127.0.0.1:8081/queryAssetsByIpJson",
+  "Package":"http://127.0.0.1:9526/windows/agent.zip",
+  "Package_md5":"http://127.0.0.1:9526/windows/md5.txt",
+  "Install_Path":"C:\\7roadyw\\agent"
+}
+}

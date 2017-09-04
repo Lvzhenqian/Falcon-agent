@@ -11,17 +11,18 @@ SCRIPTPATH = os.path.dirname(os.path.realpath(sys.executable))
 cfg_file = os.path.join(SCRIPTPATH, 'cfg.json')
 install_file = os.path.join(SCRIPTPATH, 'install.json')
 if not os.path.exists(cfg_file) or not os.path.exists(install_file):
-    logging.error(u"找不到 %s 文件或者 %s 文件！系统退出！"%(cfg_file,install_file))
+    logging.error(u"找不到 %s 文件或者 %s 文件！系统退出！" % (cfg_file, install_file))
     time.sleep(3)
     sys.exit(0)
 # cfg.json加载
-DEBUG = False
+DEBUG, MLOG = False, False
 try:
-    logging.debug(u"开始加载%s配置文件！"%cfg_file)
+    logging.debug(u"开始加载%s配置文件！" % cfg_file)
     with open(cfg_file) as confile:
         config = json.load(confile)
     HOSTNAME = config.get('hostname')
     DEBUG = config.get('debug')
+    MLOG = config.get('metric_log', False)
     IP = config.get('ip')
     HEARTBEAT = config.get('heartbeat')
     TRANSFER = config.get('transfer')
@@ -36,18 +37,17 @@ except Exception as e:
 
 
 def loadINSTALL():
-    '''
+    """
     加载 install.json文件，方便后期修改下载更新地址。
     :return:
-    '''
+    """
     # install.json加载
     try:
         logging.debug(u"开始加载%s配置文件！" % install_file)
         with open(install_file) as infile:
             ifile = json.load(infile)
         return dict(GETIP=ifile.get('GetIP'), ZKAPI=ifile.get('ZkAPI'), PACKAGE=ifile.get('Package'),
-                    PACKAGEMD5=ifile.get('Package_md5'), INSTALLPATH=ifile.get('Install_Path'),
-                    DOWNLOADPATH=ifile.get('Download_Path'))
+                    PACKAGEMD5=ifile.get('Package_md5'), INSTALLPATH=ifile.get('Install_Path'))
     except Exception as e:
         l = logging.getLogger('root.errcfg')
         l.error(e)
@@ -55,14 +55,23 @@ def loadINSTALL():
 
 ##日志配置
 LOGNAME = 'app.log'
-leve = logging.DEBUG if DEBUG else logging.INFO
-conf_log = logging.getLogger('root.config')
+mt_log = 'metric.log'
+# base log
+base_leve = logging.DEBUG if DEBUG else logging.INFO
+conf_log = logging.getLogger(u'配置读取器')
 conf_log.propagate = False
 log_fmt = logging.Formatter('[%(asctime)s]:[%(name)s]:[%(levelname)s]:%(message)s')
-
 log_File = logging.FileHandler(filename=LOGNAME, encoding='utf-8')
-log_File.setLevel(leve)
+log_File.setLevel(base_leve)
 log_File.setFormatter(log_fmt)
+# metric log
+if MLOG:
+    metric_leve = logging.DEBUG
+    metric_fmt = logging.Formatter('[%(name)s]:[%(asctime)s]:%(message)s')
+    metric_file = logging.FileHandler(filename=mt_log, encoding='utf-8')
+    metric_file.setLevel(metric_leve)
+    metric_file.setFormatter(metric_fmt)
+
 
 # console = logging.StreamHandler(stream=sys.stdout)
 # console.setLevel(leve)
@@ -71,9 +80,10 @@ log_File.setFormatter(log_fmt)
 
 
 class urlopener(object):
-    '''
+    """
     统一url的访问以及关闭。
-    '''
+    """
+
     def __init__(self, url):
         self.url = url
 
@@ -86,10 +96,10 @@ class urlopener(object):
 
 
 def coding():
-    '''
+    """
     终端字符乱码问题解决函数
     :return:
-    '''
+    """
     if sys.getdefaultencoding() == 'ascii':
         reload(sys)
         sys.setdefaultencoding('utf8')

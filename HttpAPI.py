@@ -2,11 +2,11 @@
 import logging
 from flask import Flask, request, jsonify
 from JsonClient import UpdateMetric
-from config import log_File, leve
+from config import log_File, base_leve
 
 app = Flask(__name__)
-api_log = logging.getLogger('root.HttpAPI')
-api_log.setLevel(leve)
+api_log = logging.getLogger(u'API接口')
+api_log.setLevel(base_leve)
 api_log.propagate = False
 api_log.addHandler(log_File)
 

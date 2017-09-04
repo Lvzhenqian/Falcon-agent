@@ -1,12 +1,12 @@
 # coding:utf8
 import os
 import logging
-from config import log_File, leve
+from config import log_File, base_leve
 from JsonClient import UpdateMetric
 import crond
 
-manage_log = logging.getLogger('root.Mange')
-manage_log.setLevel(leve)
+manage_log = logging.getLogger(u'脚本管理器')
+manage_log.setLevel(base_leve)
 manage_log.propagate = False
 manage_log.addHandler(log_File)
 
@@ -15,9 +15,9 @@ manage_log.addHandler(log_File)
 
 
 class JobsManage:
-    '''
+    """
     插件管理类，用于读取并执行plugin里的.py文件。并把获取到的值加入metric列表
-    '''
+    """
     def __init__(self, plugin):
         self.PluginPath = plugin
 

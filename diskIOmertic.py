@@ -5,10 +5,10 @@ import time
 import pythoncom
 
 from win32com.client import GetObject
-from config import leve, log_File, HOSTNAME
+from config import base_leve, log_File, HOSTNAME
 
-disk_io_stat = logging.getLogger('root.Disk_IO')
-disk_io_stat.setLevel(leve)
+disk_io_stat = logging.getLogger(u'磁盘IO提取')
+disk_io_stat.setLevel(base_leve)
 disk_io_stat.propagate = False
 disk_io_stat.addHandler(log_File)
 
